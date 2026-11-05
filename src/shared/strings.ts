@@ -5,11 +5,15 @@ type LocalizableKeys = {
   sideBySideMode: string;
   previewMode: string;
   syntaxHiddenMode: string;
+  typoraMode: string;
   saveCleanHtml: string;
   saveStyledHtml: string;
   copyHtml: string;
   copyRichText: string;
   copyCode: string;
+  copyTable: string;
+  copied: string;
+  failedToSaveImage: string;
   failedToCopy: string;
   untitled: string;
   version: string;
@@ -27,11 +31,15 @@ const strings: Record<Locale, Localizable> = {
     sideBySideMode: 'Preview (Side-by-Side)',
     previewMode: 'Preview (Overlay)',
     syntaxHiddenMode: 'Mixed (Syntax Hidden)',
+    typoraMode: 'Typora Style',
     saveCleanHtml: 'Save Clean HTML',
     saveStyledHtml: 'Save Styled HTML',
     copyHtml: 'Copy HTML',
     copyRichText: 'Copy Rich Text',
     copyCode: 'Copy Code',
+    copyTable: 'Copy Table',
+    copied: 'Copied',
+    failedToSaveImage: 'Failed to save the pasted image.',
     failedToCopy: 'Failed to copy. Please try again.',
     untitled: 'Untitled',
     version: 'Version',
@@ -47,11 +55,15 @@ const strings: Record<Locale, Localizable> = {
     sideBySideMode: '预览（并排）',
     previewMode: '预览（覆盖）',
     syntaxHiddenMode: '混合（隐藏语法）',
+    typoraMode: 'Typora 风格',
     saveCleanHtml: '保存无样式 HTML',
     saveStyledHtml: '保存带样式 HTML',
     copyHtml: '复制 HTML',
     copyRichText: '复制富文本',
     copyCode: '复制代码',
+    copyTable: '复制表格',
+    copied: '已复制',
+    failedToSaveImage: '无法保存粘贴的图片。',
     failedToCopy: '复制失败，请重试。',
     untitled: '未命名',
     version: '版本',
@@ -68,11 +80,15 @@ const strings: Record<Locale, Localizable> = {
     copyHtml: '拷貝 HTML',
     copyRichText: '複製富文字',
     copyCode: '拷貝程式碼',
+    copyTable: '拷貝表格',
+    copied: '已拷貝',
+    failedToSaveImage: '無法儲存貼上的圖片。',
     failedToCopy: '複製失敗，請再試一次。',
     editMode: 'Markdown 原始碼',
     sideBySideMode: '預覽（並排）',
     previewMode: '預覽（覆蓋）',
     syntaxHiddenMode: '混合（隱藏語法）',
+    typoraMode: 'Typora 風格',
     untitled: '未命名',
     version: '版本',
     source: '原始碼',

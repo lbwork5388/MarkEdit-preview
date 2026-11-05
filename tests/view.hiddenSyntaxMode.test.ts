@@ -163,7 +163,7 @@ describe('Preview refresh positioning', () => {
     expect(syncScrollProgress).not.toHaveBeenCalled();
   });
 
-  test.each(['edit', 'syntaxHidden', 'sideBySide'] as const)('invalidates pending renders when switching to %s without display', async mode => {
+  test.each(['edit', 'syntaxHidden', 'typora', 'sideBySide'] as const)('invalidates pending renders when switching to %s without display', async mode => {
     const { view, pane } = await setUpPreview();
     await view.renderHtmlPreview(true);
     const calls = mocks.handlePostRender.mock.calls;
@@ -209,6 +209,40 @@ describe('Syntax-hidden mode', () => {
     setViewMode(ViewMode.preview, false);
 
     expect(mocks.editorView.focus).toHaveBeenCalledTimes(2);
+  });
+
+  describe('Typora mode', () => {
+    test('is an editor-only mode with a new stable cache value', async () => {
+      vi.resetModules();
+      const view = await import('../src/view');
+      expect(view.ViewMode.typora).toBe(4);
+      view.setViewMode(view.ViewMode.typora, false);
+      expect(view.isEditorOnlyMode()).toBe(true);
+      expect(mocks.setHiddenSyntaxMode).toHaveBeenLastCalledWith(mocks.editorView, true, true);
+      expect(mocks.editorView.focus).toHaveBeenCalledOnce();
+      expect(localStorage.getItem('ui.view-mode')).toBe('4');
+      await view.renderHtmlPreview();
+      expect(mocks.renderMarkdown).not.toHaveBeenCalled();
+      view.restoreViewMode();
+      expect(mocks.setHiddenSyntaxMode).toHaveBeenLastCalledWith(mocks.editorView, true, true);
+    });
+
+    test('rotates between Typora and preview without injecting Source and restores the cache', async () => {
+      vi.resetModules();
+      mocks.viewModes.splice(0, mocks.viewModes.length, 'typora', 'preview');
+      const view = await import('../src/view');
+      view.changeViewMode();
+      expect(view.currentViewMode()).toBe(view.ViewMode.typora);
+      view.changeViewMode();
+      expect(view.currentViewMode()).toBe(view.ViewMode.preview);
+      view.changeViewMode();
+      expect(view.currentViewMode()).toBe(view.ViewMode.typora);
+      vi.resetModules();
+      const restored = await import('../src/view');
+      restored.restoreViewMode();
+      expect(restored.currentViewMode()).toBe(restored.ViewMode.typora);
+      expect(mocks.setHiddenSyntaxMode).toHaveBeenLastCalledWith(mocks.editorView, true, true);
+    });
   });
 
   test('enables hidden syntax only in syntax-hidden mode', async () => {

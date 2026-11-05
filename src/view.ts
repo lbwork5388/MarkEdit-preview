@@ -35,6 +35,7 @@ export enum ViewMode {
   sideBySide,
   preview,
   syntaxHidden,
+  typora,
 }
 
 export function setUp() {
@@ -115,7 +116,11 @@ export function setViewMode(mode: ViewMode, needsDisplay = true) {
   }
 
   const editorView = MarkEdit.editorView;
-  setHiddenSyntaxMode(editorView, mode === ViewMode.syntaxHidden);
+  if (mode === ViewMode.typora) {
+    setHiddenSyntaxMode(editorView, true, true);
+  } else {
+    setHiddenSyntaxMode(editorView, mode === ViewMode.syntaxHidden);
+  }
 
   if (isEditorOnlyMode()) {
     // Don't call contentDOM.focus() here, it scrolls to the top
@@ -159,11 +164,12 @@ export function changeViewMode() {
       case 'side-by-side': return ViewMode.sideBySide;
       case 'preview': return ViewMode.preview;
       case 'syntax-hidden': return ViewMode.syntaxHidden;
+      case 'typora': return ViewMode.typora;
       default: return undefined;
     }
   }).filter(mode => mode !== undefined);
 
-  const canEdit = configuredModes.some(mode => mode === ViewMode.edit || mode === ViewMode.syntaxHidden);
+  const canEdit = configuredModes.some(mode => mode === ViewMode.edit || mode === ViewMode.syntaxHidden || mode === ViewMode.typora);
   const rotation = canEdit ? configuredModes : [ViewMode.edit, ...configuredModes];
 
   // When current mode is not found, start at the beginning
@@ -182,6 +188,8 @@ export function restoreViewMode() {
   if (currentViewMode() === newMode) {
     if (newMode === ViewMode.syntaxHidden) {
       setHiddenSyntaxMode(MarkEdit.editorView, true);
+    } else if (newMode === ViewMode.typora) {
+      setHiddenSyntaxMode(MarkEdit.editorView, true, true);
     }
 
     return;
@@ -196,7 +204,7 @@ export function currentViewMode() {
 
 export function isEditorOnlyMode() {
   const mode = currentViewMode();
-  return mode === ViewMode.edit || mode === ViewMode.syntaxHidden;
+  return mode === ViewMode.edit || mode === ViewMode.syntaxHidden || mode === ViewMode.typora;
 }
 
 export async function renderHtmlPreview(syncScroll = currentViewMode() !== ViewMode.preview || !previewPane.hasChildNodes()) {

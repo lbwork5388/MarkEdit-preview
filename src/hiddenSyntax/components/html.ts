@@ -166,7 +166,8 @@ export class HtmlWidget extends WidgetType {
     const root = container.attachShadow({ mode: 'open' });
     const theme = document.createElement('style');
     const updateTheme = () => {
-      theme.textContent = editorThemeCss(MarkEdit.editorConfig?.theme ?? 'github', view.state.facet(EditorView.darkTheme));
+      const name = view.dom.classList.contains('cm-typoraMode') ? 'typora' : MarkEdit.editorConfig?.theme ?? 'github';
+      theme.textContent = editorThemeCss(name, view.state.facet(EditorView.darkTheme));
       view.requestMeasure();
     };
 
@@ -176,8 +177,8 @@ export class HtmlWidget extends WidgetType {
 
     const style = document.createElement('style');
     style.textContent = this.block
-      ? ':host { display: block; } .markdown-body { font: inherit; white-space: normal; overflow-wrap: anywhere; overflow: auto; }'
-      : ':host { display: inline; } .markdown-body { display: inline; font: inherit; white-space: normal; overflow-wrap: anywhere; } .markdown-body::before, .markdown-body::after { content: none; }';
+      ? ':host { display: block; } .markdown-body { font: inherit; padding: 0; white-space: normal; overflow-wrap: anywhere; overflow: auto; }'
+      : ':host { display: inline; } .markdown-body { display: inline; font: inherit; padding: 0; white-space: normal; overflow-wrap: anywhere; } .markdown-body::before, .markdown-body::after { content: none; }';
 
     const body = document.createElement(this.block ? 'div' : 'span');
     body.className = 'markdown-body';

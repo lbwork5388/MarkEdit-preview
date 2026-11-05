@@ -20,6 +20,9 @@ import winterIsComingLight from '../styles/themes/winter-is-coming/light.css?raw
 import winterIsComingDark from '../styles/themes/winter-is-coming/dark.css?raw';
 import xcodeLight from '../styles/themes/xcode/light.css?raw';
 import xcodeDark from '../styles/themes/xcode/dark.css?raw';
+import typoraBase from '../styles/themes/typora/base.css?raw';
+import typoraLight from '../styles/themes/typora/light.css?raw';
+import typoraDark from '../styles/themes/typora/dark.css?raw';
 
 import alertsBase from '../styles/alerts/base.css?raw';
 import alertsLight from '../styles/alerts/light.css?raw';
@@ -43,9 +46,10 @@ export const previewThemeNames = [
   'synthwave84',
   'winter-is-coming',
   'xcode',
+  'typora',
 ] as const;
 
-type ThemeVariants = { light?: string; dark?: string };
+type ThemeVariants = { base?: string; light?: string; dark?: string };
 
 const previewThemes: Record<string, ThemeVariants> = {
   'github': { light: githubLight, dark: githubDark },
@@ -58,6 +62,7 @@ const previewThemes: Record<string, ThemeVariants> = {
   'synthwave84': { dark: synthwave84Dark },
   'winter-is-coming': { light: winterIsComingLight, dark: winterIsComingDark },
   'xcode': { light: xcodeLight, dark: xcodeDark },
+  'typora': { base: typoraBase, light: typoraLight, dark: typoraDark },
 };
 
 export function coreCss(colorScheme: ColorScheme = 'auto') {
@@ -82,7 +87,8 @@ export function coreCss(colorScheme: ColorScheme = 'auto') {
 export function editorThemeCss(name: string, isDark: boolean) {
   const variants = previewThemes[name.replace(/-(light|dark|dawn)$/, '')] ?? previewThemes['github'];
   const colors = isDark ? variants.dark ?? variants.light : variants.light ?? variants.dark;
-  return `${githubBase}\n${colors}`;
+  const fallback = variants.base === typoraBase ? (isDark ? githubDark : githubLight) : '';
+  return `${githubBase}\n${fallback}\n${colors}\n${variants.base ?? ''}`;
 }
 
 export function previewThemeCss(colorScheme: ColorScheme = 'auto') {
@@ -101,7 +107,9 @@ export function previewThemeCss(colorScheme: ColorScheme = 'auto') {
 
   const styles = [
     githubBase,
+    ...(variants.base === typoraBase ? createCss(colorScheme, githubLight, githubDark) : []),
     ...createCss(colorScheme, light, dark),
+    variants.base ?? '',
   ];
 
   return styles.join('\n');

@@ -21,6 +21,7 @@ import { hiddenSyntaxTheme } from './theme';
 import { unorderedListSyntax } from './unorderedList';
 import { correctedLineUp, selectionReveals, stablePointerSelection } from './selection';
 import { inlineRendering } from '../support/settings';
+import { typoraStyleExtension } from './typora';
 
 const hiddenSyntax = Decoration.mark({ class: 'cm-md-syntaxHiddenSource' });
 const hiddenQuoteSyntax = Decoration.mark({ class: 'cm-md-syntaxHiddenSource cm-md-syntaxHiddenQuoteMark' });
@@ -67,6 +68,10 @@ export function createHiddenSyntaxExtension(rendering = inlineRendering) {
 }
 
 export const hiddenSyntaxExtension = createHiddenSyntaxExtension();
+export const typoraExtension = [
+  createHiddenSyntaxExtension([...new Set(['image', 'table', 'math', 'mermaid', ...inlineRendering] as const)]),
+  typoraStyleExtension,
+];
 
 function hiddenSyntaxDecorations(view: EditorView) {
   const ranges: Range<Decoration>[] = [];

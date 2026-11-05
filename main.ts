@@ -23,6 +23,7 @@ import {
 } from './src/view';
 
 import { enableHoverPreview } from './src/features/image';
+import { imagePasteExtension } from './src/features/imagePaste';
 import { startObserving } from './src/scroll';
 import { imageHoverPreview, keyboardShortcut } from './src/support/settings';
 import { hasFullHost } from './src/support/host';
@@ -85,6 +86,7 @@ if (hasFullHost()) {
       createModeItem(localized('sideBySideMode'), ViewMode.sideBySide),
       createModeItem(localized('previewMode'), ViewMode.preview),
       createModeItem(localized('syntaxHiddenMode'), ViewMode.syntaxHidden),
+      createModeItem(localized('typoraMode'), ViewMode.typora),
       { separator: true },
       ...createHtmlItems(),
       { separator: true },
@@ -112,6 +114,7 @@ if (hasFullHost()) {
       states.renderUpdater = setTimeout(renderHtmlPreview, 500);
     }),
     hiddenSyntaxModeExtension,
+    imagePasteExtension(),
   ]);
 
   MarkEdit.onEditorReady(() => {
@@ -146,7 +149,7 @@ if (hasFullHost()) {
   // Handle lineHeight change, which doesn't trigger a CodeMirror update
   if (typeof MarkEdit.onEditorConfigChange === 'function') {
     MarkEdit.onEditorConfigChange(key => {
-      if (key === 'lineHeight' && currentViewMode() === ViewMode.syntaxHidden) {
+      if (key === 'lineHeight' && (currentViewMode() === ViewMode.syntaxHidden || currentViewMode() === ViewMode.typora)) {
         MarkEdit.editorView?.requestMeasure();
       }
     });

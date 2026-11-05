@@ -25,3 +25,21 @@
 .code-copy-button:active {
   background: var(--borderColor-default, ButtonBorder);
 }
+
+.code-copy-button .code-copy-done {
+  display: none;
+}
+
+.code-copy-button.copied {
+  opacity: 1 !important;
+  color: #2da44e;
+  border-color: #2da44e;
+}
+
+.code-copy-button.copied .code-copy-done {
+  display: inline;
+}
+
+.code-copy-button.copied .code-copy-icon {
+  display: none;
+}

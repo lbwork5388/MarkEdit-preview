@@ -5,6 +5,8 @@ import { MarkEdit } from 'markedit-api';
 import { editorThemeCss } from '../../styling';
 import { resolveImageURL } from '../../features/image';
 import type { renderTableBlocks } from '../../render';
+import { localized } from '../../shared/strings';
+import { copyButtonCss, createCopyButton } from './copyButton';
 
 export const tableRenderFailed = StateEffect.define<{ doc: Text; from: number; to: number }>();
 type RenderTables = () => ReturnType<typeof renderTableBlocks>;
@@ -33,7 +35,8 @@ export class TableWidget extends WidgetType {
     const root = container.attachShadow({ mode: 'open' });
     const theme = document.createElement('style');
     const updateTheme = () => {
-      theme.textContent = editorThemeCss(MarkEdit.editorConfig?.theme ?? 'github', view.state.facet(EditorView.darkTheme));
+      const name = view.dom.classList.contains('cm-typoraMode') ? 'typora' : MarkEdit.editorConfig?.theme ?? 'github';
+      theme.textContent = editorThemeCss(name, view.state.facet(EditorView.darkTheme));
       view.requestMeasure();
     };
 
@@ -43,7 +46,12 @@ export class TableWidget extends WidgetType {
     const style = document.createElement('style');
     style.textContent = `
       :host { display: block; }
-      .markdown-body { font: inherit; min-width: 0; white-space: normal; word-break: normal; overflow-wrap: break-word; overflow-x: auto; }
+      .frame { position: relative; width: fit-content; max-width: 100%; }
+      .frame > .cm-md-copyButton { display: none; position: absolute; top: 4px; right: 4px; z-index: 1; opacity: 0; }
+      :host(:hover) .frame > .cm-md-copyButton { opacity: 0.75; }
+      .frame > .cm-md-copyButton:hover, .frame > .cm-md-copyButton.is-copied { opacity: 1; }
+      ${copyButtonCss}
+      .markdown-body { font: inherit; padding: 0; min-width: 0; white-space: normal; word-break: normal; overflow-wrap: break-word; overflow-x: auto; }
       .markdown-body > table { display: table; width: auto; max-width: min(100%, 960px); margin: 0; overflow: visible; }
       .source { white-space: pre-wrap; }
     `;
@@ -52,11 +60,29 @@ export class TableWidget extends WidgetType {
     body.className = 'markdown-body source';
     body.textContent = this.source;
 
+    const copyButton = createCopyButton(localized('copyTable'), () => {
+      const current = tableViews.get(container);
+      if (current === undefined) {
+        return undefined;
+      }
+
+      const table = current.body.querySelector('table');
+      return { text: current.source, html: table?.outerHTML };
+    });
+
+    // Shown by the editor theme through ::part, only in Typora mode
+    copyButton.setAttribute('part', 'copy-button');
+
+    const frame = document.createElement('div');
+    frame.className = 'frame';
+    frame.append(body, copyButton);
+
     const mathStyle = document.createElement('style');
-    root.append(theme, style, mathStyle, body);
+    root.append(theme, style, mathStyle, frame);
     tableViews.set(container, {
       body,
       mathStyle,
+      source: this.source,
       dispose: () => window.removeEventListener('editor-colors-changed', updateTheme),
     });
 
@@ -87,6 +113,7 @@ export class TableWidget extends WidgetType {
 
   private renderInto(container: HTMLElement, view: EditorView) {
     const state = tableViews.get(container)!;
+    state.source = this.source;
     const request = {};
     state.request = request;
 
@@ -166,6 +193,7 @@ export class TableWidget extends WidgetType {
 const tableViews = new WeakMap<HTMLElement, {
   body: HTMLElement;
   mathStyle: HTMLStyleElement;
+  source: string;
   dispose: () => void;
   request?: object;
 }>();

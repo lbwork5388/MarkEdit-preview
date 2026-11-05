@@ -23,6 +23,13 @@ export const syntaxAutoDetect = toBoolean(rootValue.syntaxAutoDetect, false);
 export const imageHoverPreview = toBoolean(rootValue.imageHoverPreview, false);
 
 /**
+ * Folder, relative to the document, for pasted images. `${filename}` is replaced with the document name without extension; `false` disables handling.
+ */
+export const pastedImageFolder = rootValue.pastedImageFolder === false
+  ? null
+  : typeof rootValue.pastedImageFolder === 'string' ? rootValue.pastedImageFolder : 'assets';
+
+/**
  * @deprecated Use inlineRendering instead.
  */
 export const inlineImages = toBoolean(rootValue.inlineImages, false);
